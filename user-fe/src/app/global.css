@@ -1,0 +1,5 @@
+.preview-thumnails {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 10px;
+}

@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Worker" ALTER COLUMN "pending_bal" SET DEFAULT 0,
+ALTER COLUMN "pending_bal" SET DATA TYPE BIGINT,
+ALTER COLUMN "locked_bal" SET DEFAULT 0,
+ALTER COLUMN "locked_bal" SET DATA TYPE BIGINT;
