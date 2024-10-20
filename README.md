@@ -31,14 +31,15 @@ TaskFund and QuickTask is a decentralized platform built on Solana that allows u
 - Workers can withdraw their Solana earnings to their Phantom wallet after completing tasks.
 
 ## Screenshots
-
-![Connect Wallet](./images/connect_wallet.png)  
+<img width="1505" alt="Screenshot 2024-10-20 at 2 03 34 PM" src="https://github.com/user-attachments/assets/0b510b7a-11d0-46b7-b1e3-2ee0dba7c915">
 *Connecting your Phantom wallet.*
 
-![Task Dashboard](./images/task_dashboard.png)  
+
+<img width="1512" alt="Screenshot 2024-10-20 at 2 02 54 PM" src="https://github.com/user-attachments/assets/fe6ceeb0-13ab-4c89-a33e-9071f774978d">
 *Task dashboard showing ongoing tasks.*
 
-![Create Task](./images/create_task.png)  
+
+<img width="1512" alt="Screenshot 2024-10-20 at 2 02 24 PM" src="https://github.com/user-attachments/assets/81e62f88-34ae-4b3d-a913-7e19b8137012">
 *Creating a new task.*
 
 ## Installation
