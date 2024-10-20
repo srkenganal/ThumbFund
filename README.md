@@ -35,12 +35,18 @@ TaskFund and QuickTask is a decentralized platform built on Solana that allows u
 *Connecting your Phantom wallet.*
 
 
+
+
 <img width="1512" alt="Screenshot 2024-10-20 at 2 02 54 PM" src="https://github.com/user-attachments/assets/fe6ceeb0-13ab-4c89-a33e-9071f774978d">
 *Task dashboard showing ongoing tasks.*
 
 
+
+
 <img width="1512" alt="Screenshot 2024-10-20 at 2 02 24 PM" src="https://github.com/user-attachments/assets/81e62f88-34ae-4b3d-a913-7e19b8137012">
 *Creating a new task.*
+
+
 
 ## Installation
 
