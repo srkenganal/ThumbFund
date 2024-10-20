@@ -55,7 +55,7 @@ TaskFund and QuickTask is a decentralized platform built on Solana that allows u
    git clone https://github.com/yourusername/taskfund-quicktask.git
    ```
 
-2. Install dependencies:
+2. Install dependencies: Go inside each directory. Do
    ```bash
    npm install
    ```
@@ -63,6 +63,11 @@ TaskFund and QuickTask is a decentralized platform built on Solana that allows u
 3. Start the application (IN FRONTEND):
    ```bash
    npm run dev
+   ```
+4. For Backend to RUN,
+   ```bash
+   tsc -b
+   node dist/index.js
    ```
 
 4. Connect to your Phantom wallet and start creating or completing tasks!
