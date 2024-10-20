@@ -60,9 +60,9 @@ TaskFund and QuickTask is a decentralized platform built on Solana that allows u
    npm install
    ```
 
-3. Start the application:
+3. Start the application (IN FRONTEND):
    ```bash
-   npm start
+   npm run dev
    ```
 
 4. Connect to your Phantom wallet and start creating or completing tasks!
