@@ -50,7 +50,7 @@ TaskFund and QuickTask is a decentralized platform built on Solana that allows u
 
 ## Installation
 
-1. Clone the repository:
+1. Clone the repository and checkout to master:
    ```bash
    git clone https://github.com/yourusername/taskfund-quicktask.git
    ```
