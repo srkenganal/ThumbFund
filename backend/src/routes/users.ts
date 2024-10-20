@@ -3,12 +3,13 @@ import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
 import { S3Client } from "@aws-sdk/client-s3";
 import nacl from "tweetnacl";
-
 import bs58 from "bs58";
-
 import { createPresignedPost } from "@aws-sdk/s3-presigned-post";
 import {
   taskDefaultTitle,
+  NETWORK,
+  taskFundSignMsg,
+  presignedUrlExpires
 } from "../config";
 
 import { auth } from "../middlewares/auth";
@@ -27,13 +28,10 @@ interface CustomRequest extends Request {
 }
 
 const prisma = new PrismaClient();
-
 const router = express.Router();
-
 // const connection = new Connection("https://api.devnet.solana.com")
-
 // Use Devnet instead of Testnet
-const connection = new Connection(clusterApiUrl("testnet"), "confirmed");
+const connection = new Connection(clusterApiUrl(NETWORK), "confirmed");
 
 // https://api.testnet.solana.com
 
@@ -50,11 +48,7 @@ interface PresignedUrlParams {
 
 router.post("/signin", async (req: Request, res: Response) => {
   console.log("sign in method");
-
-  // const walletAddress = "Fqq8GXD3x9bMdUzKEJzQqi48LC9pC4q9FxmM2ZLBjh5e";
-
   const parsedData = createUser.safeParse(req.body);
-
   if (!parsedData.success) {
     return res.status(411).json({
       message: "Invalid Signature and Public Key.",
@@ -62,7 +56,7 @@ router.post("/signin", async (req: Request, res: Response) => {
   }
 
   const message = new TextEncoder().encode(
-    `brodify wants you to sign in with your Solana account. Please sign in.`
+    taskFundSignMsg
   );
 
   const result = nacl.sign.detached.verify(
@@ -108,11 +102,9 @@ router.get(
   auth,
   async (req: CustomRequest, res: Response) => {
     try {
-      const REGION = "ap-south-1";
-      const BUCKET = "dapp-first";
-      const KEY = "user-thumnails/image.png";
-
-      // const client = new S3Client({ region: REGION });
+      const REGION = process.env.region;
+      const BUCKET = process.env.bucket || '';
+      const KEY = process.env.key || '';
 
       const client = new S3Client({
         region: REGION,
@@ -122,20 +114,14 @@ router.get(
         },
       });
 
-      // const clientUrl = await createPresignedUrlWithClient({
-      //     region: REGION,
-      //     bucket: BUCKET,
-      //     key: KEY,
-      //   });
-
       const { url, fields } = await createPresignedPost(client, {
-        Bucket: "dapp-first",
-        Key: `user-thumnails/${req?.userId}/${Date.now()}/image.png`,
+        Bucket: BUCKET,
+        Key: `${KEY}/${req?.userId}/${Date.now()}/image.png`,
         // Conditions,
         Fields: {
           "Content-Type": "image/png",
         },
-        Expires: 600, //Seconds before the presigned post expires. 3600 by default.
+        Expires: presignedUrlExpires, //Seconds before the presigned post expires. 3600 by default.
       });
 
       res.status(200).json({ url, fields });
@@ -149,15 +135,6 @@ router.get(
 const parseTransaction = (transaction: any) => {
   const { message } = transaction?.transaction;
   const instructions = message.instructions;
-
-  //   console.log(transaction, "***acsd");
-
-  //   console.log("Pre-balance (lamports):", transaction.meta.preBalances);
-  // console.log("Post-balance (lamports):", transaction.meta.postBalances);
-
-  // const transferredLamports = transaction.meta.preBalances[0] - transaction.meta.postBalances[0];
-  // console.log("Amount transferred (lamports):", transferredLamports);
-  // console.log("Amount transferred (SOL):", transferredLamports / 1_000_000_000);
 
   let obj = {
     amount:Number||0,
@@ -204,18 +181,6 @@ const parseTransaction = (transaction: any) => {
       // @ts-ignore
 
       obj.toPubkey = toPubkey;
-
-      // console.log(`Amount (lamports): ${amount}`);
-      // console.log(`Amount2 (lamports): ${amount2}`);
-
-      // console.log(`Amount (SOL): ${amount / 1_000_000_000} SOL`);
-      // console.log(`Amount2 (SOL): ${amount2 / 1_000_000_000} SOL`);
-
-      // console.log(`Instruction ${index + 1}:`);
-      // console.log(`From: ${fromPubkey}`);
-      // console.log(`To: ${toPubkey}`);
-      // console.log(`Amount (lamports): ${amount}`);
-      // console.log(`Amount (SOL): ${amount / 1_000_00} SOL`);
     }
   });
 
@@ -255,27 +220,6 @@ router.post("/task", auth, async (req: Request, res: Response) => {
   const message = transaction.transaction.message;
 
   let transDetails = parseTransaction(transaction);
-
-  // Loop through the instructions
-  // message.instructions.forEach((instruction:any, index:any) => {
-  //   console.log(`Instruction ${index + 1}:`);
-
-  //   console.log(instruction, "*** INSTRCUT ***", SystemProgram);
-
-  //   // Check if it's a SOL transfer (SystemProgram)
-  //   if (instruction.programIdIndex.equals(SystemProgram.programId)) {
-  //     const fromPubkey = message.accountKeys[instruction.keys[0]].toBase58();
-  //     const toPubkey = message.accountKeys[instruction.keys[1]].toBase58();
-  //     const amount = instruction.data.readUInt32LE(0); // Lamports (1 SOL = 1,000,000,000 lamports)
-
-  //     console.log(`From: ${fromPubkey}`);
-  //     console.log(`To: ${toPubkey}`);
-  //     console.log(`Amount (lamports): ${amount}`);
-  //     console.log(`Amount (SOL): ${amount / 1_000_000_000} SOL`);
-  //   }
-  // });
-
-  // console.log(transaction, "Dfadsfadsfds dfa3reqwer")
 
   let response = await prisma.$transaction(async (tx) => {
     const taskResp = await tx.task.create({
@@ -394,5 +338,3 @@ router.get("/task", auth, async (req: Request, res: Response) => {
 });
 
 module.exports = router;
-
-// "https://dapp-first.s3.ap-south-1.amazonaws.com/user-thumnails?X-Amz-Algorithm=&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA5FTZDELWN5ES36Z5%2F20240814%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Date=20240814T103406Z&X-Amz-Expires=3600&X-Amz-Signature=93ae83c5fcdcd2dcb7f293c35f390cbd4e9e6a84181c374ba87f010e916fc965&X-Amz-SignedHeaders=host&x-id=GetObject"

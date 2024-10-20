@@ -73,7 +73,7 @@ const MSidebar = ({
               {/* ------------------------------------------- */}
               {/* <Logo img="/images/logos/dark-logo.svg" /> */}
 
-              <Typography sx={{marginBottom: "4px", marginTop: "4px", padding: "15px 22px", paddingTop: "12px"}} variant="h3"> <Typography sx={{fontWeight: "700", display: "inline-block", color: "#5D87FF"}} variant="h3"> Brodi</Typography>fy</Typography>
+              <Typography sx={{marginBottom: "4px", marginTop: "4px", padding: "15px 22px", paddingTop: "12px"}} variant="h3"> <Typography sx={{fontWeight: "700", display: "inline-block", color: "#5D87FF"}} variant="h3"> Quick</Typography>Task</Typography>
 
               <Box>
                 {/* ------------------------------------------- */}

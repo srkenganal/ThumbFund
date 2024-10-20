@@ -1,24 +1,8 @@
 "use client";
 import { styled, Container, Box } from "@mui/material";
-import React, { useState, FC, useMemo } from "react";
+import React, { useState } from "react";
 import Header from "@/app/(DashboardLayout)/layout/header/Header";
 import Sidebar from "@/app/(DashboardLayout)/layout/sidebar/Sidebar";
-
-import {
-  ConnectionProvider,
-  WalletProvider,
-} from "@solana/wallet-adapter-react";
-import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
-import { UnsafeBurnerWalletAdapter } from "@solana/wallet-adapter-wallets";
-import {
-  WalletModalProvider,
-  WalletDisconnectButton,
-  WalletMultiButton,
-} from "@solana/wallet-adapter-react-ui";
-import { clusterApiUrl } from "@solana/web3.js";
-
-// Default styles that can be overridden by your app
-import "@solana/wallet-adapter-react-ui/styles.css";
 
 const MainWrapper = styled("div")(() => ({
   display: "flex",
@@ -47,31 +31,6 @@ export default function RootLayout({
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
-  // The network can be set to 'devnet', 'testnet', or 'mainnet-beta'.
-  const network = WalletAdapterNetwork.Testnet;
-
-  // You can also provide a custom RPC endpoint.
-  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
-
-  const wallets = useMemo(
-    () => [
-      /**
-       * Wallets that implement either of these standards will be available automatically.
-       *
-       *   - Solana Mobile Stack Mobile Wallet Adapter Protocol
-       *     (https://github.com/solana-mobile/mobile-wallet-adapter)
-       *   - Solana Wallet Standard
-       *     (https://github.com/anza-xyz/wallet-standard)
-       *
-       * If you wish to support a wallet that supports neither of those standards,
-       * instantiate its legacy wallet adapter here. Common legacy adapters can be found
-       * in the npm package `@solana/wallet-adapter-wallets`.
-       */
-      // new UnsafeBurnerWalletAdapter(),
-    ],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [network]
-  );
 
   return (
     <MainWrapper className="mainwrapper">
@@ -87,9 +46,6 @@ export default function RootLayout({
       {/* Main Wrapper */}
       {/* ------------------------------------------- */}
 
-      <ConnectionProvider endpoint={endpoint}>
-        <WalletProvider wallets={wallets} autoConnect>
-          <WalletModalProvider>
             <PageWrapper className="page-wrapper">
               {/* ------------------------------------------- */}
               {/* Header */}
@@ -114,9 +70,6 @@ export default function RootLayout({
                 {/* ------------------------------------------- */}
               </Container>
             </PageWrapper>
-          </WalletModalProvider>
-        </WalletProvider>
-      </ConnectionProvider>
     </MainWrapper>
   );
 }

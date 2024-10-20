@@ -5,8 +5,67 @@ import { Grid, Box, Card, Stack, Typography } from "@mui/material";
 import PageContainer from "@/app/(DashboardLayout)/components/container/PageContainer";
 import Logo from "@/app/(DashboardLayout)/layout/shared/logo/Logo";
 import AuthLogin from "../auth/AuthLogin";
+import { useRouter } from "next/navigation";
+
+import { useEffect } from "react";
+
+import {
+  WalletDisconnectButton,
+  WalletMultiButton,
+} from "@solana/wallet-adapter-react-ui";
+import { useWallet } from "@solana/wallet-adapter-react";
+import axios from "axios";
 
 const Login2 = () => {
+  const { publicKey, signMessage, disconnect, connecting, connected } = useWallet();
+  const router = useRouter(); // Initialize the useRouter hook
+
+
+  console.log("**** URL", connecting, connected);
+
+
+  const signMsgSend = async () => {
+    try {
+      if (!publicKey) throw new Error("Wallet not connected!");
+      // if (!signMessage)
+      //   throw new Error("Wallet does not support message signing!");
+
+      const message = new TextEncoder().encode(
+        `TaskDoer wants you to sign in with your Solana account. Please sign in.`
+      );
+      const signature = await signMessage?.(message);
+
+
+      const url = `${process.env.NEXT_PUBLIC_DOMAIN}/v1/workers/signin`;
+
+
+
+
+
+      const resp = await axios.post(url, {
+        signature,
+        publicKey: publicKey?.toString(),
+      });
+
+      sessionStorage.setItem("token", resp.data.token);
+
+      if (resp.data.token) {
+        // Redirect to the homepage after successful login
+        router.push("/"); // Redirect to home page
+      }
+    } catch (error: any) {
+      // notify("error", `Sign Message failed: ${error?.message}`);
+      console.log("Something went wrong", error);
+      disconnect();
+    }
+  };
+
+  useEffect(() => {
+    if (publicKey ) {
+      signMsgSend();
+    }
+  }, [publicKey]);
+
   return (
     <PageContainer title="Login" description="this is Login page">
       <Box
@@ -42,10 +101,12 @@ const Login2 = () => {
           >
             <Card
               elevation={9}
-              sx={{ p: 4, zIndex: 1, width: "100%", maxWidth: "500px" }}
+              sx={{ p: 2, zIndex: 1, width: "100%", maxWidth: "500px" }}
             >
               <Box display="flex" alignItems="center" justifyContent="center">
-                <Logo />
+                {/* <Logo /> */}
+              <Typography sx={{marginBottom: "2px", marginTop: "4px", paddingTop: "12px"}} variant="h2"> <Typography sx={{fontWeight: "700", display: "inline-block", color: "#5D87FF"}} variant="h2"> Task</Typography>Doer</Typography>
+
               </Box>
               <AuthLogin
                 subtext={
@@ -53,37 +114,10 @@ const Login2 = () => {
                     variant="subtitle1"
                     textAlign="center"
                     color="textSecondary"
-                    mb={1}
+                    mb={5}
                   >
-                    Your Social Campaigns
+                    Your work, your rewards.
                   </Typography>
-                }
-                subtitle={
-                  <Stack
-                    direction="row"
-                    spacing={1}
-                    justifyContent="center"
-                    mt={3}
-                  >
-                    <Typography
-                      color="textSecondary"
-                      variant="h6"
-                      fontWeight="500"
-                    >
-                      New to Modernize?
-                    </Typography>
-                    <Typography
-                      component={Link}
-                      href="/authentication/register"
-                      fontWeight="500"
-                      sx={{
-                        textDecoration: "none",
-                        color: "primary.main",
-                      }}
-                    >
-                      Create an account
-                    </Typography>
-                  </Stack>
                 }
               />
             </Card>

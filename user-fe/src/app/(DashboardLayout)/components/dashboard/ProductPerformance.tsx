@@ -24,7 +24,7 @@ const TaskPerformance = () => {
     try {
       const response = await axios.get(`${process.env.NEXT_PUBLIC_DOMAIN}/v1/users/task`, {
         headers: {
-          Authorization: localStorage.getItem("token"),
+          Authorization: sessionStorage.getItem("token"),
         },
       });
       settasks(response.data);

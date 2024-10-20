@@ -43,7 +43,7 @@ const NextTaskPage = () => {
           headers: {
             "Content-Type": "application/json",
             // Remove Authorization if it's not needed
-            Authorization: localStorage.getItem("token") || "",
+            Authorization: sessionStorage.getItem("token") || "",
           },
         }
       );
@@ -68,7 +68,7 @@ const NextTaskPage = () => {
         `${process.env.NEXT_PUBLIC_DOMAIN}/v1/workers/next-task`,
         {
           headers: {
-            Authorization: localStorage.getItem("token"),
+            Authorization: sessionStorage.getItem("token"),
           },
         }
       );

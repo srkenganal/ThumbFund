@@ -74,7 +74,8 @@ const MSidebar = ({
               {/* ------------------------------------------- */}
               {/* <Logo img="/images/logos/dark-logo.svg" /> Some Text */}
 
-              <Typography sx={{marginBottom: "4px", marginTop: "4px", padding: "15px 22px", paddingTop: "12px"}} variant="h3"> <Typography sx={{fontWeight: "700", display: "inline-block", color: "#5D87FF"}} variant="h3"> Worki</Typography>fy</Typography>
+              <Typography sx={{marginBottom: "4px", marginTop: "4px", padding: "15px 22px", paddingTop: "12px"}} variant="h3"> <Typography sx={{fontWeight: "700", display: "inline-block", color: "#5D87FF"}} variant="h3"> Task</Typography>Doer</Typography>
+
               <Box>
                 {/* ------------------------------------------- */}
                 {/* Sidebar Items */}

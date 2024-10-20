@@ -10,88 +10,60 @@ import {
 } from "@mui/material";
 import Link from "next/link";
 
-import CustomTextField from "@/app/(DashboardLayout)/components/forms/theme-elements/CustomTextField";
+import {
+  WalletDisconnectButton,
+  WalletMultiButton,
+} from "@solana/wallet-adapter-react-ui";
 
 interface loginType {
   title?: string;
   subtitle?: JSX.Element | JSX.Element[];
   subtext?: JSX.Element | JSX.Element[];
+  publicKey?: any;
 }
 
-const AuthLogin = ({ title, subtitle, subtext }: loginType) => (
+const AuthLogin = ({ title, subtitle, subtext, publicKey }: loginType) => (
   <>
-    {title ? (
-      <Typography fontWeight="700" variant="h2" mb={1}>
-        {title}
-      </Typography>
-    ) : null}
-
     {subtext}
-
-    <Stack>
-      <Box>
-        <Typography
-          variant="subtitle1"
-          fontWeight={600}
-          component="label"
-          htmlFor="username"
-          mb="5px"
-        >
-          Username
-        </Typography>
-        <CustomTextField variant="outlined" fullWidth />
-      </Box>
-      <Box mt="25px">
-        <Typography
-          variant="subtitle1"
-          fontWeight={600}
-          component="label"
-          htmlFor="password"
-          mb="5px"
-        >
-          Password
-        </Typography>
-        <CustomTextField type="password" variant="outlined" fullWidth />
-      </Box>
-      <Stack
-        justifyContent="space-between"
-        direction="row"
-        alignItems="center"
-        my={2}
-      >
-        <FormGroup>
-          <FormControlLabel
-            control={<Checkbox defaultChecked />}
-            label="Remeber this Device"
-          />
-        </FormGroup>
-        <Typography
-          component={Link}
-          href="/"
-          fontWeight="500"
-          sx={{
-            textDecoration: "none",
-            color: "primary.main",
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      mt={5}
+      sx={{ width: '100%' }} // Ensures full width container
+    >
+      {!publicKey ? (
+        <WalletMultiButton
+          style={{
+            width: '100%',            // Full width
+            backgroundColor: '#5D87FF', // Material UI primary color
+            color: '#fff',            // White text
+            padding: '12px 24px',     // Button padding
+            fontSize: '16px',         // Font size
+            textAlign: 'center',      // Center the text
+            borderRadius: '4px',      // Border radius
+            display: 'flex',          // Flexbox for proper alignment
+            justifyContent: 'center', // Center the content horizontally
+            alignItems: 'center'      // Center the content vertically
           }}
-        >
-          Forgot Password ?
-        </Typography>
-      </Stack>
-    </Stack>
-    <Box>
-      <Button
-        color="primary"
-        variant="contained"
-        size="large"
-        fullWidth
-        component={Link}
-        href="/"
-        type="submit"
-      >
-        Sign In
-      </Button>
+        />
+      ) : (
+        <WalletDisconnectButton
+          style={{
+            width: '100%',            // Full width
+            backgroundColor: '#5D87FF', // Material UI primary color
+            color: '#fff',            // White text
+            padding: '12px 24px',     // Button padding
+            fontSize: '16px',         // Font size
+            textAlign: 'center',      // Center the text
+            borderRadius: '4px',      // Border radius
+            display: 'flex',          // Flexbox for proper alignment
+            justifyContent: 'center', // Center the content horizontally
+            alignItems: 'center'      // Center the content vertically
+          }}
+        />
+      )}
     </Box>
-    {subtitle}
   </>
 );
 

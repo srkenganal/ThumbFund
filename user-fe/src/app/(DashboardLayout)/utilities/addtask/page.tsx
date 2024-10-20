@@ -44,6 +44,8 @@ const AddTaskPage = () => {
   const [title, setTitle] = useState("");
   const [uploading, setUpLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [payInProgress, setPayInProgress] = useState(false);
+
   const { connection } = useConnection();
   const { publicKey, sendTransaction } = useWallet();
   const [txtSignature, setTxtSignature] = useState("");
@@ -57,7 +59,7 @@ const AddTaskPage = () => {
       `${process.env.NEXT_PUBLIC_DOMAIN}/v1/users/presigned-url`,
       {
         headers: {
-          Authorization: localStorage.getItem("token"),
+          Authorization: sessionStorage.getItem("token"),
         },
       }
     );
@@ -83,7 +85,7 @@ const AddTaskPage = () => {
           headers: {
             "Content-Type": "application/json",
             // Remove Authorization if it's not needed
-            Authorization: localStorage.getItem("token") || "",
+            Authorization: sessionStorage.getItem("token") || "",
           },
         }
       );
@@ -191,11 +193,15 @@ const AddTaskPage = () => {
     e.preventDefault();
     let signature: TransactionSignature | undefined = undefined;
     if (!publicKey) throw new Error("Wallet not connected!");
+    setPayInProgress(true);
+
+    try {
+
 
     const transaction = new Transaction().add(
       SystemProgram.transfer({
         fromPubkey: publicKey,
-        toPubkey: new PublicKey("Fqq8GXD3x9bMdUzKEJzQqi48LC9pC4q9FxmM2ZLBjh5e"),
+        toPubkey: new PublicKey("EfpmygsoVJrWZKpSRTWS3qcng4TyFA9KFKNEharjLaBp"),
         lamports: 100000000,
       })
     );
@@ -216,6 +222,13 @@ const AddTaskPage = () => {
     });
 
     setTxtSignature(signature);
+
+    } catch(e) {
+      console.error("SOME ERROR", e);
+    } finally {
+      setPayInProgress(false);
+    }
+
   };
 
   return (
@@ -239,7 +252,7 @@ const AddTaskPage = () => {
                     alt="Preview"
                     width="200"
                     height="300"
-                    style={{ borderRadius: "8px" }}
+                    style={{ borderRadius: "8px", marginTop: "8px" }}
                   />
                 ))}
               </DivWrapper>
@@ -253,22 +266,25 @@ const AddTaskPage = () => {
                   value={title}
                   onChange={handleChange}
                   margin="normal"
+                  style={{ marginBottom: "16px" }}
+                  required={true}
                 />
                 <input
                   type="file"
                   name="file"
                   onChange={handleFileChange}
                   style={{ marginBottom: "16px" }}
+                  required={true}
                 />
                 <StyledButton
                   type="submit"
                   className="primary"
                   variant="contained"
                   color="primary"
-                  disabled={submitting}
+                  disabled={submitting || payInProgress}
                   fullWidth
                 >
-                  {submitting
+                  {submitting || payInProgress
                     ? "Loading ..."
                     : txtSignature
                     ? "Submit"

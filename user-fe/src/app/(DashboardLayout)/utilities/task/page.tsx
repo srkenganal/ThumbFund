@@ -36,7 +36,7 @@ const TaskItemPage = () => {
       `${process.env.NEXT_PUBLIC_DOMAIN}/v1/users/task/${id}`,
       {
         headers: {
-          Authorization: localStorage.getItem("token"),
+          Authorization: sessionStorage.getItem("token"),
         },
       }
     );
@@ -65,12 +65,12 @@ const TaskItemPage = () => {
   return (
     <Grid container spacing={3}>
 
-<Grid item xs={12} md={12} lg={12}>
+      <Grid item xs={12} md={12} lg={12}>
         <Typography variant="h4">{loader ? "Loading..." : ''}</Typography>
       </Grid>
 
-        
-      
+
+
       <Grid item xs={12} md={12} lg={12}>
         <Typography variant="h4">{taskTitle}</Typography>
       </Grid>
@@ -78,48 +78,48 @@ const TaskItemPage = () => {
         //@ts-ignore
         task.length
           ? task.map((product, index) => (
-              <Grid item xs={12} md={4} lg={3} key={index}>
-                <BlankCard>
-                  <Typography component={Link} href="/">
-                    <Avatar
-                      src={
-                        //@ts-ignore
-                        product.photo
-                      }
-                      variant="square"
-                      sx={{
-                        height: 250,
-                        width: "100%",
-                      }}
-                    />
-                  </Typography>
+            <Grid item xs={12} md={4} lg={3} key={index}>
+              <BlankCard>
+                <Typography component={Link} href="/">
+                  <Avatar
+                    src={
+                      //@ts-ignore
+                      product.photo
+                    }
+                    variant="square"
+                    sx={{
+                      height: 250,
+                      width: "100%",
+                    }}
+                  />
+                </Typography>
 
-                  <CardContent sx={{ p: 3, pt: 2 }}>
-                    <Typography variant="h6">
-                      {
-                        //@ts-ignore
-                        product.title
-                      }
-                    </Typography>
-                    <Stack
-                      direction="row"
-                      alignItems="center"
-                      justifyContent="space-between"
-                      mt={1}
-                    >
-                      <Stack direction="row" alignItems="center">
-                        <Typography variant="h6">
-                          {
-                            //@ts-ignore
-                            product.price
-                          }
-                        </Typography>
-                      </Stack>
+                <CardContent sx={{ p: 3, pt: 2 }}>
+                  <Typography variant="h6">
+                    {
+                      //@ts-ignore
+                      product.title
+                    }
+                  </Typography>
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    mt={1}
+                  >
+                    <Stack direction="row" alignItems="center">
+                      <Typography variant="h6">
+                        {
+                          //@ts-ignore
+                          product.price
+                        }
+                      </Typography>
                     </Stack>
-                  </CardContent>
-                </BlankCard>
-              </Grid>
-            ))
+                  </Stack>
+                </CardContent>
+              </BlankCard>
+            </Grid>
+          ))
           : ""
       }
     </Grid>

@@ -1,7 +1,11 @@
 import express, { Response, Request } from "express";
 import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
-import { TOTAL_TASK_ALLOWED } from "../config";
+import {
+  NETWORK,
+  taskDoerSignMsg,
+  TOTAL_TASK_ALLOWED
+} from "../config";
 import { workerAuth } from "../middlewares/workerAuth";
 import { createSubmission } from "../types";
 import { getNextTask } from "../db";
@@ -22,10 +26,10 @@ const router = express.Router();
 
 const prisma = new PrismaClient();
 
-const connection = new Connection(clusterApiUrl("testnet"), "confirmed");
+const connection = new Connection(clusterApiUrl(NETWORK), "confirmed");
 
 router.post("/signin", async (req: Request, res: Response) => {
-  console.log("sign in method");
+  console.log("worker sign in method");
 
   const parsedData = createUser.safeParse(req.body);
 
@@ -36,7 +40,7 @@ router.post("/signin", async (req: Request, res: Response) => {
   }
 
   const message = new TextEncoder().encode(
-    `workify wants you to sign in with your Solana account. Please sign in.`
+    taskDoerSignMsg
   );
 
   const result = nacl.sign.detached.verify(
@@ -74,7 +78,7 @@ router.post("/signin", async (req: Request, res: Response) => {
       const token = jwt.sign({ userId: user.id }, process.env.workerSecretKey || '');
       return res.status(200).json({ token, pending_bal: 0, locked_bal: 0 });
     } else {
-      const token = jwt.sign({ userId: userExists.id }, process.env.workerSecretKey||'');
+      const token = jwt.sign({ userId: userExists.id }, process.env.workerSecretKey || '');
       return res.status(200).json({
         token,
         pending_bal: userExists.pending_bal.toString(),
@@ -103,6 +107,9 @@ router.post("/payout", workerAuth, async (req: Request, res: Response) => {
       message: "No User",
     });
   }
+
+  const adminWalletAddress = new PublicKey(process.env.ADMIN_WALLET_ADDRESS);
+  const adminBalance = await connection.getBalance(adminWalletAddress);
 
   const transaction = new Transaction().add(
     SystemProgram.transfer({
@@ -137,8 +144,6 @@ router.post("/payout", workerAuth, async (req: Request, res: Response) => {
       },
     });
   });
-
-  console.log(signature, "** FINAL SIGNATURE ***");
 
   return res.status(200).json("Done");
 });
@@ -213,14 +218,13 @@ router.post("/submission", workerAuth, async (req: Request, res: Response) => {
   }
 
   let response = await prisma.$transaction(async (tx) => {
-    let submissionAmt = Number(
-      nextTaskResp.amount / BigInt(TOTAL_TASK_ALLOWED)
-    );
+    let submissionAmt = Number(nextTaskResp.amount) / Number(BigInt(TOTAL_TASK_ALLOWED)); // Convert BigInt to Number here
+
     const taskResp = await tx.submission.create({
       data: {
         task_id: parsedData.data.task_id,
         option_id: parsedData.data.selection,
-        amount: submissionAmt.toString(),
+        amount: submissionAmt.toString(), // Convert amount to string
         worker_id: userId,
       },
     });
@@ -231,59 +235,22 @@ router.post("/submission", workerAuth, async (req: Request, res: Response) => {
       },
       data: {
         pending_bal: {
-          increment: submissionAmt,
+          increment: submissionAmt, // No need to convert here if `increment` works with numbers
         },
       },
     });
 
-    // await tx.task.update({
-    //   where: {
-    //     id: parsedData.data.task_id,
-    //   },
-    //   data: {
-    //     done: true,
-    //   },
-    // });
-    taskResp.amount = taskResp.amount.toString();
+    taskResp.amount = taskResp.amount.toString(); // Ensure `BigInt` is serialized correctly
     return taskResp;
   });
 
   const nextTask = await getNextTask(userId);
 
-  return res.status(201).json(nextTask);
+  return res.status(201).json({
+    ...nextTask,
+    amount: nextTask?.amount.toString(), // Convert `BigInt` in the response
+  });
 });
 
-router.post("/signin", async (req, res) => {
-  // SIGN IN.
-  console.log("sign in method");
-
-  const walletAddress = "Fqq8GXD3x9bMdUzKEJzQqi48LC9pC4q9FxmM2ZLBjh5w";
-
-  try {
-    const workerExists = await prisma.worker.findUnique({
-      where: {
-        address: walletAddress,
-      },
-    });
-
-    if (!workerExists) {
-      const worker = await prisma.worker.create({
-        data: {
-          address: walletAddress,
-          locked_bal: 0,
-          pending_bal: 0,
-        },
-      });
-      const token = jwt.sign({ userId: worker.id }, process.env.workerSecretKey || '');
-      return res.status(200).json({ token });
-    } else {
-      const token = jwt.sign({ userId: workerExists.id }, process.env.workerSecretKey || '');
-      return res.status(200).json({ token });
-    }
-  } catch (e) {
-    console.log(e, "ERROR");
-    res.status(500).json("Something went wrong!!!");
-  }
-});
 
 module.exports = router;
