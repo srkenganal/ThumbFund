@@ -1,5 +1,5 @@
 
-# SolTask
+# TaskFund
 
 TaskFund and QuickTask is a decentralized platform built on Solana that allows users to create tasks and fund them with SOL, while workers complete tasks to earn crypto rewards. It's designed to be simple, customizable, and highly versatile for different use cases, such as selecting logos, designs, or thumbnails.
 
